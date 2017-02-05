@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-YOUR HEADER COMMENT HERE
+Gene Finder Project
 
 @author: Alexander Li
 
@@ -173,7 +173,7 @@ def longest_ORF_noncoding(dna, num_trials):
     maxlengthDNA = 0
     for i in range(num_trials):
         if(maxlengthDNA < len(longest_ORF(randomDNA))):
-            maxlengthDNA = len(longestORF(randomDNA))
+            maxlengthDNA = len(longest_ORF(randomDNA))
         shuffle_string(randomDNA)
     return maxlengthDNA
 
@@ -192,8 +192,16 @@ def coding_strand_to_AA(dna):
         >>> coding_strand_to_AA("ATGCCCGCTTT")
         'MPA'
     """
-    # TODO: implement this
-    pass
+    amino = []
+
+    if len(dna) % 3 == 1:
+        dna = dna[:-1]  # takes the last dna codon out if not a multiple of 3
+    if len(dna) % 3 == 2:
+        dna = dna[:-2]  # same thing but with 2 at the end
+    for i in range(0, len(dna), 3):
+        codon = dna[i:i+3]
+        amino.append(aa_table[codon])
+    return ''.join(amino)
 
 
 def gene_finder(dna):
@@ -202,10 +210,15 @@ def gene_finder(dna):
         dna: a DNA sequence
         returns: a list of all amino acid sequences coded by the sequence dna.
     """
-    # TODO: implement this
-    pass
+    aasequence = []
+    limit = longest_ORF_noncoding(dna, 1000)  # sets reasonable limit for dna
+    allOrfs = find_all_ORFs_both_strands(dna)
+    for oneOrf in allOrfs:
+        if len(oneOrf) > limit:
+            aasequence.append(coding_strand_to_AA(oneOrf))
+    return aasequence
 
 
 if __name__ == "__main__":
     import doctest
-    doctest.run_docstring_examples(longest_ORF, globals(), verbose=True)
+    doctest.run_docstring_examples(coding_strand_to_AA, globals())
